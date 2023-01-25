@@ -24,9 +24,9 @@ def github_retry_on_rate_limit(func):
             except RateLimitExceededException:
                 print("Rate Limit hit.")
                 rl = github.get_rate_limit()
-                time_to_sleep = (
+                time_to_sleep = int((
                     rl.core.reset - datetime.datetime.utcnow()
-                ).total_seconds()
+                ).total_seconds() + 1)
                 print("Sleeping for %s seconds" % time_to_sleep)
                 time.sleep(time_to_sleep)
 
