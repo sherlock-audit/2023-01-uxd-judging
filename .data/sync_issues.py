@@ -83,12 +83,12 @@ def process_directory(repo, path):
     ]
     for item in repo_items:
         print("Reading file %s" % item.name)
-        if item.name in ["unlabeled", "low-info", "closed"]:
+        if item.name in ["low", "false"]:
             process_directory(repo, item.path)
             continue
 
         parent = None
-        closed = any(x in path for x in ["unlabeled", "low-info", "closed"])
+        closed = any(x in path for x in ["low", "false"])
         files = []
         dir_issues_ids = []
         severity = None
@@ -105,8 +105,8 @@ def process_directory(repo, path):
             files = [item]
 
         for file in files:
-            if "report" in file.name:
-                issue_id = int(file.name.replace("-report.md", ""))
+            if "best" in file.name:
+                issue_id = int(file.name.replace("-best.md", ""))
                 parent = issue_id
             else:
                 issue_id = int(file.name.replace(".md", ""))
@@ -136,7 +136,7 @@ def process_directory(repo, path):
         # Set the parent field for all duplicates in this directory
         if len(files) > 1 and parent is None:
             raise Exception(
-                "Issue %s does not have a primary file (-report.md)." % item.path
+                "Issue %s does not have a primary file (-best.md)." % item.path
             )
 
         if parent:
