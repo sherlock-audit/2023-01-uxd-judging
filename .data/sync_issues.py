@@ -321,7 +321,7 @@ def main():
                 new_labels = issue_labels + new_labels
 
                 must_update = False
-                if existing_labels != new_labels:
+                if sorted(existing_labels) != sorted(new_labels):
                     must_update = True
                     print(
                         "\tLabels differ. Old: %s New: %s"
