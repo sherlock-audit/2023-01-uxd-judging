@@ -3,7 +3,7 @@
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/288 
 
 ## Found by 
-Bahurum, Zarf, HollaDieWaldfee, Ruhum, 0xNazgul, yixxas, kankodu, hl\_, 0x52, koxuan, dipp, ck, ctf\_sec, carrot, clems4ever, berndartmueller, GimelSec, chiranz, DecorativePineapple
+clems4ever, dipp, 0xNazgul, DecorativePineapple, ctf\_sec, unforgiven, 0x52, ck, HollaDieWaldfee, GimelSec, chiranz, berndartmueller, yixxas, Zarf, carrot, koxuan, hl\_, Ruhum, kankodu, Bahurum
 
 ## Summary
 
@@ -253,6 +253,74 @@ The destination address would be the address of the receiving contract (normal s
 
 Considering this a valid high issue based on the above comments. 
 
+**0xIryna**
+
+LayerZero team is here. Thank you for digging into this!
+We have a max payload size (10000) set in our `RelayerV2` contract which prevents the described situation (the contract isn’t verified, but you can fork a chain and test). If a payload exceeds the specified limit the transaction will revert on the source.
+If a client application is configured to use a non-default Relayer it must set the payload limit itself.  Generally, we believe it’s a protocol’s responsibility to enforce the max payload size.
+
+**berndartmueller**
+
+Escalate for 10 USDC
+
+Consider the response from the LayerZero team above to reconsider the severity and validity of this issue. If UXD uses the `RelayerV2` contract provided by LayerZero, this is a non-issue.
+
+**sherlock-admin**
+
+ > Escalate for 10 USDC
+> 
+> Consider the response from the LayerZero team above to reconsider the severity and validity of this issue. If UXD uses the `RelayerV2` contract provided by LayerZero, this is a non-issue.
+
+You've created a valid escalation for 10 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+To change the amount you've staked on this escalation: Edit your comment **(do not create a new comment)**.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**rvierdiyev**
+
+Escalate for 15 usdc. 
+Increased amount just to make sure this will be rechecked.
+
+**sherlock-admin**
+
+ > Escalate for 15 usdc. 
+> Increased amount just to make sure this will be rechecked.
+
+You've created a valid escalation for 15 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+To change the amount you've staked on this escalation: Edit your comment **(do not create a new comment)**.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**hrishibhat**
+
+Escalation rejected
+
+Comment from Layer Zero shows that there is a valid risk from payload which is now fixed:
+https://github.com/LayerZero-Labs/LayerZero/pull/24/commits
+The relayer did not seem have a check for max payload size previously. 
+
+Additionally as suggested by the LZ  
+> we believe it’s a protocol’s responsibility to enforce the max payload size.
+
+**sherlock-admin**
+
+> Escalation rejected
+> 
+> Comment from Layer Zero shows that there is a valid risk from payload which is now fixed:
+> https://github.com/LayerZero-Labs/LayerZero/pull/24/commits
+> The relayer did not seem have a check for max payload size previously. 
+> 
+> Additionally as suggested by the LZ  
+> > we believe it’s a protocol’s responsibility to enforce the max payload size.
+
+This issue's escalations have been rejected!
+
+Watsons who escalated this issue will have their escalation amount deducted from their next payout.
+
 
 
 # Issue H-3: RageTrade senior vault USDC deposits are subject to utilization caps which can lock deposits for long periods of time leading to UXD instability 
@@ -260,7 +328,7 @@ Considering this a valid high issue based on the above comments.
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/253 
 
 ## Found by 
-ctf\_sec, 0xNazgul, 0x52, clems4ever
+clems4ever, ctf\_sec, 0x52, 0xNazgul
 
 ## Summary
 
@@ -359,6 +427,61 @@ Create a function to calculate and withdraw protocol profit to be awarded to sta
 Profits on `PerpDepository` are currently locked in the depository and can be unlocked in future updates through positive PnL rebalancing.
 `RageDepository` profits are locked in that contract and can be withdrawn by the contract owner (governance) through the `withdrawProfits()` function
 
+**rvierdiyev**
+
+Escalate for 11 USDC.
+
+This is not a vulnerability.
+As @WarTech9 said, 
+>`RageDepository` profits are locked in that contract and can be withdrawn by the contract owner (governance) through the `withdrawProfits()` function
+
+This is design choice of protocol. I have discussed that during the contest with @WarTech9, so he explained me that and i didn't submit that as issue. As he said, that rewards are not lost and governance can withdraw it later to reuse.
+
+Also author of report states in impact section that:
+> Profits owed stakers will be trapped in the contract and they will lose that portion of their revenue
+
+But this is not true, as i described above, that value is not stucked as protocol can withdraw it.
+
+**sherlock-admin**
+
+ > Escalate for 11 USDC.
+> 
+> This is not a vulnerability.
+> As @WarTech9 said, 
+> >`RageDepository` profits are locked in that contract and can be withdrawn by the contract owner (governance) through the `withdrawProfits()` function
+> 
+> This is design choice of protocol. I have discussed that during the contest with @WarTech9, so he explained me that and i didn't submit that as issue. As he said, that rewards are not lost and governance can withdraw it later to reuse.
+> 
+> Also author of report states in impact section that:
+> > Profits owed stakers will be trapped in the contract and they will lose that portion of their revenue
+> 
+> But this is not true, as i described above, that value is not stucked as protocol can withdraw it.
+
+You've created a valid escalation for 11 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+To change the amount you've staked on this escalation: Edit your comment **(do not create a new comment)**.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**hrishibhat**
+
+Escalation rejected
+
+This is in PerpDepository and not RageDepository. Profits in PerpDepository are stuck with no method to unlock them except while upgrading the contract. 
+Although contract upgrades are to be used for feature updates and add changes to handle extreme situations, this issue is clearly a smart contract bug where funds are locked.  
+
+**sherlock-admin**
+
+> Escalation rejected
+> 
+> This is in PerpDepository and not RageDepository. Profits in PerpDepository are stuck with no method to unlock them except while upgrading the contract. 
+> Although contract upgrades are to be used for feature updates and add changes to handle extreme situations, this issue is clearly a smart contract bug where funds are locked.  
+
+This issue's escalations have been rejected!
+
+Watsons who escalated this issue will have their escalation amount deducted from their next payout.
+
 
 
 # Issue H-5: USDC deposited to PerpDepository.sol are irretrievable and effectively causes UDX to become undercollateralized 
@@ -366,7 +489,7 @@ Profits on `PerpDepository` are currently locked in the depository and can be un
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/250 
 
 ## Found by 
-csanuragjain, 0x52, ctf\_sec
+csanuragjain, 0x52
 
 ## Summary
 
@@ -422,7 +545,7 @@ Allow all USDC now deposited into the insurance fund to be redeemed 1:1
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/249 
 
 ## Found by 
-cccz, ctf\_sec, HonorLt, berndartmueller, 0x52, DecorativePineapple, 0Kage
+HonorLt, 0x52, berndartmueller, 0Kage, cccz, DecorativePineapple, ctf\_sec
 
 ## Summary
 
@@ -475,7 +598,7 @@ I recommend pulling pulling the TWAP fresh each time from ClearingHouseConfig, b
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/192 
 
 ## Found by 
-peanuts, keccak123, ck, yixxas, minhtrng, jonatascm, HonorLt, zeroknots, GimelSec, HollaDieWaldfee, koxuan, wagmi
+HonorLt, minhtrng, jonatascm, koxuan, yixxas, wagmi, ck, HollaDieWaldfee, zeroknots, GimelSec, peanuts, keccak123
 
 ## Summary
 
@@ -506,79 +629,180 @@ Manual Review
 
 `rebalance` and `rebalanceLite` should use `msg.sender` to replace the function argument account address.
 
-# Issue H-8: PerpDepository.netAssetDeposits variable can prevent users to withdraw with underflow error 
+## Discussion
 
-Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/97 
+**WarTech9**
+
+This is a duplicate of #288 
+
+
+
+# Issue M-1: `rebalanceLite` should provide a slippage protection 
+
+Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/429 
 
 ## Found by 
-rvierdiiev
+HollaDieWaldfee, hansfriese
 
 ## Summary
-PerpDepository.netAssetDeposits variable can prevent users to withdraw with underflow error
+Users can lose funds while rebalancing.
+
 ## Vulnerability Detail
-When user deposits using PerpDepository, then `netAssetDeposits` variable is increased with the base assets amount, provided by depositor.
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L283-L288
+The protocol provides two kinds of rebalancing functions - `rebalance()` and `rebalanceLite()`.
+While the function `rebalance()` is protected from an unintended slippage because the caller can specify `amountOutMinimum`, `rebalanceLite()` does not have this protection.
+This makes the user vulnerable to unintended slippage due to various scenarios.
 ```solidity
-    function _depositAsset(uint256 amount) private {
-        netAssetDeposits += amount;
-
-
-        IERC20(assetToken).approve(address(vault), amount);
-        vault.deposit(assetToken, amount);
-    }
+PerpDepository.sol
+597:     function rebalanceLite(
+598:         uint256 amount,
+599:         int8 polarity,
+600:         uint160 sqrtPriceLimitX96,
+601:         address account
+602:     ) external nonReentrant returns (uint256, uint256) {
+603:         if (polarity == -1) {
+604:             return
+605:                 _rebalanceNegativePnlLite(amount, sqrtPriceLimitX96, account);
+606:         } else if (polarity == 1) {
+607:             // disable rebalancing positive PnL
+608:             revert PositivePnlRebalanceDisabled(msg.sender);
+609:             // return _rebalancePositivePnlLite(amount, sqrtPriceLimitX96, account);
+610:         } else {
+611:             revert InvalidRebalance(polarity);
+612:         }
+613:     }
+614:
+615:     function _rebalanceNegativePnlLite(
+616:         uint256 amount,
+617:         uint160 sqrtPriceLimitX96,
+618:         address account
+619:     ) private returns (uint256, uint256) {
+620:         uint256 normalizedAmount = amount.fromDecimalToDecimal(
+621:             ERC20(quoteToken).decimals(),
+622:             18
+623:         );
+624:
+625:         _checkNegativePnl(normalizedAmount);
+626:         IERC20(quoteToken).transferFrom(account, address(this), amount);
+627:         IERC20(quoteToken).approve(address(vault), amount);
+628:         vault.deposit(quoteToken, amount);
+629:
+630:         bool isShort = false;
+631:         bool amountIsInput = true;
+632:         (uint256 baseAmount, uint256 quoteAmount) = _placePerpOrder(
+633:             normalizedAmount,
+634:             isShort,
+635:             amountIsInput,
+636:             sqrtPriceLimitX96
+637:         );
+638:         vault.withdraw(assetToken, baseAmount);
+639:         IERC20(assetToken).transfer(account, baseAmount);
+640:
+641:         emit Rebalanced(baseAmount, quoteAmount, 0);
+642:
+643:         return (baseAmount, quoteAmount);
+644:     }
 ```
-
-Also when user withdraws, this `netAssetDeposits` variable is decreased with base amount that user has received for redeeming his UXD tokens.
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L294-L302
+Especially, according to the communication with the PERP dev team, it is possible for the Perp's ClearingHouse to fill the position partially when the price limit is specified (`sqrtPriceLimitX96`).
+It is also commented in the Perp contract comments [here](https://github.com/perpetual-protocol/perp-curie-contract/blob/27ea8e2c4be37d1dd58c1eed3b3cc269d398a091/contracts/ClearingHouse.sol#L63).
 ```solidity
-    function _withdrawAsset(uint256 amount, address to) private {
-        if (amount > netAssetDeposits) {
-            revert InsufficientAssetDeposits(netAssetDeposits, amount);
-        }
-        netAssetDeposits -= amount;
-
-
-        vault.withdraw(address(assetToken), amount);
-        IERC20(assetToken).transfer(to, amount);
-    }
+63:     /// @param sqrtPriceLimitX96 tx will fill until it reaches this price but WON'T REVERT
+64:     struct InternalOpenPositionParams {
+65:         address trader;
+66:         address baseToken;
+67:         bool isBaseToQuote;
+68:         bool isExactInput;
+69:         bool isClose;
+70:         uint256 amount;
+71:         uint160 sqrtPriceLimitX96;
+72:     }
 ```
+So it is possible that the order is not placed to the full amount.
+As we can see in the #L626~#L628, the UXD protocol grabs the quote token of `amount` and deposits to the Perp's vault.
+And the unused amount will remain in the Perp vault while this is supposed to be returned to the user who called this rebalance function.
 
-The problem here is that when user deposits X assets, then he receives Y UXD tokens. And when later he redeems his Y UXD tokens he can receive more or less than X assets. This can lead to situation when netAssetDeposits variable will be seting to negative value which will revert tx.
-
-Example.
-1.User deposits 1 WETH when it costs 1200$. As result 1200 UXD tokens were minted and netAssetDeposits was set to 1.
-2.Price of WETH has decreased and now it costs 1100.
-3.User redeem his 1200 UXD tokens and receives from perp protocol 1200/1100=1.09 WETH. But because netAssetDeposits is 1, then transaction will revert inside `_withdrawAsset` function with underflow error.
 ## Impact
-User can't redeem all his UXD tokens.
-## Code Snippet
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L264-L278
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L294-L302
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L240-L253
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L283-L288
-## Tool used
+Users can lose funds while lite rebalancing.
 
+## Code Snippet
+https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L597
+
+## Tool used
 Manual Review
 
 ## Recommendation
-As you don't use this variable anywhere else, you can remove it.
-Otherwise you need to have 2 variables instead: totalDeposited and totalWithdrawn. 
+Add a protection parameter to the function `rebalanceLite()` so that the user can specify the minimum out amount.
 
 ## Discussion
 
 **WarTech9**
 
-One fix: `netAssetDeposits` should be updated during rebalancing.
+The caller can specify the target price using the `sqrtPriceLimitX96` parameter to the `rebalanceLite` function. This offers slippage protection.
+
+
+**hansfriese**
+
+Escalate for 10 USDC
+
+I suggest the judge and the sponsor read this issue carefully again.
+The key problem is that the Perp protocol can partially fill the position, especially when the `sqrtPriceLimitX96 ` is specified.
+(This is related to how Uniswap works, check [here](https://jeiwan.net/posts/public-bug-report-uniswap-swaprouter/))
+So it is possible that the order is not placed to the full amount and the remaining amount should be returned to the user.
+I admit that my explanation sounded vague because I mentioned slippage.
+I mean, the protocol should return the remaining value or allow the user to explicitly specify the minimum output amount.
+Please check the screenshot of the chat I had with the Perp team.
+They confirmed it is possible that the order is not filled to the full amount when the `sqrtPriceLimitX96 ` is specified.
+
+![screenshot_47](https://user-images.githubusercontent.com/45533148/216356589-8b3751ad-8731-401b-853f-dbb93512a80c.png)
+![screenshot_48](https://user-images.githubusercontent.com/45533148/216356592-e752dc2e-26cb-42d1-bf5e-e4c91c3928fe.png)
+
+
+**sherlock-admin**
+
+ > Escalate for 10 USDC
+> 
+> I suggest the judge and the sponsor read this issue carefully again.
+> The key problem is that the Perp protocol can partially fill the position, especially when the `sqrtPriceLimitX96 ` is specified.
+> (This is related to how Uniswap works, check [here](https://jeiwan.net/posts/public-bug-report-uniswap-swaprouter/))
+> So it is possible that the order is not placed to the full amount and the remaining amount should be returned to the user.
+> I admit that my explanation sounded vague because I mentioned slippage.
+> I mean, the protocol should return the remaining value or allow the user to explicitly specify the minimum output amount.
+> Please check the screenshot of the chat I had with the Perp team.
+> They confirmed it is possible that the order is not filled to the full amount when the `sqrtPriceLimitX96 ` is specified.
+> 
+> ![screenshot_47](https://user-images.githubusercontent.com/45533148/216356589-8b3751ad-8731-401b-853f-dbb93512a80c.png)
+> ![screenshot_48](https://user-images.githubusercontent.com/45533148/216356592-e752dc2e-26cb-42d1-bf5e-e4c91c3928fe.png)
+> 
+
+You've created a valid escalation for 10 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+To change the amount you've staked on this escalation: Edit your comment **(do not create a new comment)**.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
 
 **WarTech9**
 
-@acamill This _can only be partially fixed_ by updating `netAssetsDeposits` while rebalancing but that's only resolves the issue if rebalancing has occurred. It would still be possible to run into this if rebalancing has not yet occurred so its not a full fix. 
-We could use 2 variables as suggested but due to changes in asset values between mints and redeems, those would diverge and would be meaningless. 
-We already have the position size which tells us this information, thus removing this field is the better option.
+With the updated comments I agree there is a valid issue here. If the requested amount is not filled completely in the Perp order, we should only transfer from the user the amount returned from the `_placePerpOrder()` call. 
+
+**hrishibhat**
+
+Escalation accepted. 
+
+As pointed out in the Escalation that there is the possibility of partial order fills when sqrtPriceLimitX96 is specified. 
+
+**sherlock-admin**
+
+> Escalation accepted. 
+> 
+> As pointed out in the Escalation that there is the possibility of partial order fills when sqrtPriceLimitX96 is specified. 
+
+This issue's escalations have been accepted!
+
+Contestants' payouts and scores will be updated according to the changes made on this issue.
 
 
 
-# Issue M-1: `PerpDepository._rebalanceNegativePnlWithSwap()` shouldn't use a `sqrtPriceLimitX96` twice. 
+# Issue M-2: `PerpDepository._rebalanceNegativePnlWithSwap()` shouldn't use a `sqrtPriceLimitX96` twice. 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/425 
 
@@ -642,7 +866,7 @@ Manual Review
 ## Recommendation
 I think we can use the `sqrtPriceLimitX96` param for one pool only and it would be enough as there is an `amountOutMinimum` condition.
 
-# Issue M-2: Vulnerable GovernorVotesQuorumFraction version 
+# Issue M-3: Vulnerable GovernorVotesQuorumFraction version 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/423 
 
@@ -697,81 +921,12 @@ Considering this issue a valid medium.
 
 
 
-# Issue M-3: Unsafe type casting 
-
-Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/416 
-
-## Found by 
-keccak123, HonorLt
-
-## Summary
-The codebase contains several potential unsafe type casting that under certain conditions might brick the system.
-
-## Vulnerability Detail
-There are some places in the code where it is assumed that the value will always fit into a narrow type so explicit casting is used, e.g.:
-```solidity
-    function _processQuoteMint(uint256 quoteAmount) private returns (uint256) {
-        uint256 normalizedAmount = quoteAmount.fromDecimalToDecimal(
-            ERC20(quoteToken).decimals(),
-            18
-        );
-        _checkNegativePnl(normalizedAmount);
-        quoteMinted += int256(normalizedAmount);
-```
-```solidity
-    function getUnrealizedPnl() public view returns (int256) {
-        return int256(redeemableUnderManagement) - int256(getPositionValue());
-    }
-```
-```solidity
-    function _rebalanceNegativePnlWithSwap(
-        uint256 amount,
-        uint256 amountOutMinimum,
-        uint160 sqrtPriceLimitX96,
-        uint24 swapPoolFee,
-        address account
-    ) private returns (uint256, uint256) {
-  ...
-  int256 shortFall = int256(
-            quoteAmount.fromDecimalToDecimal(18, ERC20(quoteToken).decimals())
-        ) - int256(quoteAmountOut);
-  ...
-```
-```solidity
-    function getUnrealizedPnl() public view returns (int256) {
-        return int256(getDepositoryAssets()) - int256(netAssetDeposits);
-    }
-```
-
-While realistically it is not likely to deal with very large values, with smart contracts it is never a good practice to assume something, better always check and take extra precautions.
-
-## Impact
-If the actual value does not fit in the new type, it will be truncated and will lead to the messed up accounting of the protocol.
-The likelihood is very low but the impact would be critical thus I think this issue deserves to be of Medium severity.
-
-## Code Snippet
-
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L391
-
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L430
-
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L508-L510
-
-https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/rage-trade/RageDnDepository.sol#L157
-
-## Tool used
-
-Manual Review
-
-## Recommendation
-Use the Safe casting library from OZ when changing types.
-
 # Issue M-4: Deposit and withdraw to the vault with the wrong decimals of amount in contract `PerpDepository` 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/402 
 
 ## Found by 
-peanuts, Bahurum, yixxas, HollaDieWaldfee, berndartmueller, duc, rvierdiiev
+berndartmueller, yixxas, HollaDieWaldfee, Bahurum, rvierdiiev, duc, peanuts
 
 ## Summary
 Function `vault.deposit` and `vault.withdraw` of vault in contract `PerpDepository` need to be passed with the amount in raw decimal of tokens (is different from 18 in case using USDC, WBTC, ... as base and quote tokens). But some calls miss the conversion of decimals from 18 to token's decimal, and pass wrong decimals into them.
@@ -855,6 +1010,11 @@ Should convert the param `amount` from token's decimal to decimal 18 before `vau
 
 After further review this issue is valid. `quoteAmount` should be converted to `quoteDecimals` before `vault.deposit()` in `_rebalanceNegativePnlWithSwap()`
 
+**WarTech9**
+
+Issue exists in `_rebalanceNegativePnlWithSwap()` before `vault.deposit()`. Need to convert from 18 decimals to 6 for USDC.
+Issue does not exist in `_rebalanceNegativePnlLite` where amount returned by `_placePerpOrder()` is already in 18 decimals. So no conversion required before `vault.withdraw()`.
+
 
 
 # Issue M-5: PerpDepository#_rebalanceNegativePnlWithSwap fails to approve vault for quote deposit 
@@ -862,7 +1022,7 @@ After further review this issue is valid. `quoteAmount` should be converted to `
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/372 
 
 ## Found by 
-Bahurum, yixxas, HonorLt, GimelSec, jprod15, 0x52, rvierdiiev
+HonorLt, 0x52, yixxas, Bahurum, rvierdiiev, GimelSec
 
 ## Summary
 
@@ -923,7 +1083,7 @@ Two separate issues here. #339 is pointing out it's not approved for the swapper
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/346 
 
 ## Found by 
-peanuts, hl\_, HollaDieWaldfee, berndartmueller
+peanuts, HollaDieWaldfee, hl\_, berndartmueller
 
 ## Summary
 
@@ -1038,7 +1198,7 @@ Consider using the `Vault.getSettlementTokenValue()` function to determine the a
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/339 
 
 ## Found by 
-cccz, Jeiwan, Bahurum, CRYP70, berndartmueller, rvierdiiev, GimelSec, 0x52, koxuan
+0x52, Jeiwan, berndartmueller, koxuan, jprod15, Bahurum, cccz, CRYP70, rvierdiiev, GimelSec
 
 ## Summary
 
@@ -1105,7 +1265,7 @@ Consider adding the appropriate token approval before the swap in L507.
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/338 
 
 ## Found by 
-JohnnyTime, ck, Zarf, berndartmueller, rvierdiiev
+berndartmueller
 
 ## Summary
 
@@ -1212,6 +1372,57 @@ Manual Review
 Consider changing the internal accounting of `netAssetDeposits` to include `quoteToken` deposits.
 
 
+## Discussion
+
+**berndartmueller**
+
+Escalate for 25 USDC
+
+I think this issue is wrongly duped. The duped issues mention a similar issue in the context of the **rebalancing** functions. This issue demonstrated here is about **quote minting** in the case of a negative PnL.
+
+I think it's justified to leave this issue on its own without the duplicate issues. The duped issues should be left as a separate issue (Please note that #434 does not mention the real impact of not being able to redeem fully).
+
+(https://github.com/sherlock-audit/2023-01-uxd-judging/issues/97 has also been considered a separate issue)
+
+**sherlock-admin**
+
+ > Escalate for 25 USDC
+> 
+> I think this issue is wrongly duped. The duped issues mention a similar issue in the context of the **rebalancing** functions. This issue demonstrated here is about **quote minting** in the case of a negative PnL.
+> 
+> I think it's justified to leave this issue on its own without the duplicate issues. The duped issues should be left as a separate issue (Please note that #434 does not mention the real impact of not being able to redeem fully).
+> 
+> (https://github.com/sherlock-audit/2023-01-uxd-judging/issues/97 has also been considered a separate issue)
+
+You've created a valid escalation for 25 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+To change the amount you've staked on this escalation: Edit your comment **(do not create a new comment)**.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**hrishibhat**
+
+Escalation accepted
+
+Agreed that the issues is different from its dupes. 
+Separating from the rest of the issues #178, #262, #141 as they are considered as low together, since not updating `netAssetDeposits` on rebalance does not cause any real issues. 
+Also, issue #434 touches upon the issue partially, but does not fully describe the complete issue & its impact. Hence considering it a low. 
+
+**sherlock-admin**
+
+> Escalation accepted
+> 
+> Agreed that the issues is different from its dupes. 
+> Separating from the rest of the issues #178, #262, #141 as they are considered as low together, since not updating `netAssetDeposits` on rebalance does not cause any real issues. 
+> Also, issue #434 touches upon the issue partially, but does not fully describe the complete issue & its impact. Hence considering it a low. 
+
+This issue's escalations have been accepted!
+
+Contestants' payouts and scores will be updated according to the changes made on this issue.
+
+
+
 # Issue M-9: Price disparities between spot and perpetual pricing can heavily destabilize UXD 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/305 
@@ -1301,12 +1512,158 @@ Considering this issue as a valid medium.
 
 
 
-# Issue M-10: PerpDepository#_placePerpOrder miscalculates fees paid when shorting 
+# Issue M-10: The `FullMath` library is unable to handle intermediate overflows due to overflow that's desired but never reached 
+
+Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/273 
+
+## Found by 
+DecorativePineapple
+
+## Summary
+The [`FullMath`](https://github.com/sherlock-audit/2023-01-uxd/blob/2f3e8890ba64331be08b690018f93d3b67e82c11/contracts/libraries/FullMath.sol#L10) library doesn't correctly handle the case when an intermediate value overflows 256 bits. This happens because an overflow is desired in this case but it's never reached.
+
+## Vulnerability Detail
+The [`FullMath`](https://github.com/sherlock-audit/2023-01-uxd/blob/2f3e8890ba64331be08b690018f93d3b67e82c11/contracts/libraries/FullMath.sol#L10) library was taken from [Uniswap v3-core](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/FullMath.sol). However, the original solidity version that was used was < 0.8.0, meaning that the execution didn't revert wan an overflow was reached. This effectively means that when a phantom overflow (a multiplication and division where an intermediate value overflows 256 bits) occurs the execution will revert and the correct result won't be returned. The original library was designed in a way that could handle intermediate overflows.
+The [`FullMath`](https://github.com/sherlock-audit/2023-01-uxd/blob/2f3e8890ba64331be08b690018f93d3b67e82c11/contracts/libraries/FullMath.sol#L10) library is used in the [`MathLib library`](https://github.com/sherlock-audit/2023-01-uxd/blob/2f3e8890ba64331be08b690018f93d3b67e82c11/contracts/libraries/MathLib.sol#L7) in order to format an 18-decimal number to a FixedPoint 96.Q96 number.
+
+## Impact
+The correct result isn't returned in this case and the execution gets reverted when a phantom overflows occurs.
+
+## Code Snippet
+The [`FullMath`](https://github.com/sherlock-audit/2023-01-uxd/blob/2f3e8890ba64331be08b690018f93d3b67e82c11/contracts/libraries/FullMath.sol#L10) library which doesn't use an unchecked block:
+
+```solidity
+library FullMath {
+    /// @notice Calculates floor(a×b÷denominator) with full precision. Throws if result overflows a uint256 or denominator == 0
+    /// @param a The multiplicand
+    /// @param b The multiplier
+    /// @param denominator The divisor
+    /// @return result The 256-bit result
+    /// @dev Credit to Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
+    function mulDiv(
+        uint256 a,
+        uint256 b,
+        uint256 denominator
+    ) internal pure returns (uint256 result) {
+        // 512-bit multiply [prod1 prod0] = a * b
+        // Compute the product mod 2**256 and mod 2**256 - 1
+        // then use the Chinese Remainder Theorem to reconstruct
+        // the 512 bit result. The result is stored in two 256
+        // variables such that product = prod1 * 2**256 + prod0
+        uint256 prod0; // Least significant 256 bits of the product
+
+        ...
+
+      result = prod0 * inv;
+        return result;
+    }
+
+    function mulDivRoundingUp(
+        uint256 a,
+        uint256 b,
+        uint256 denominator
+    ) internal pure returns (uint256 result) {
+        result = mulDiv(a, b, denominator);
+        if (mulmod(a, b, denominator) > 0) {
+            require(result < type(uint256).max);
+            result++;
+        }
+    }
+}
+```
+
+## Tool used
+Manual Code Review
+
+## Recommendation
+It is advised to put the entire function bodies of `mulDiv` and `mulDivRoundingUp` in an unchecked block. A modified version of the original `Fullmath` library that uses unchecked blocks to handle the overflow, can be found in the `0.8` branch of the [Uniswap v3-core repo](https://github.com/Uniswap/v3-core/blob/0.8/contracts/libraries/FullMath.sol).
+
+## Discussion
+
+**WarTech9**
+
+Unchecked doesn't handle the error, any overflow/underflow would fail silently. upgrading to the newer version of Fullmath should would be good though but is low priority.
+
+**hrishibhat**
+
+Agree with sponsor comment. Considering the issue as informational
+
+**DecorativePineapple**
+
+Escalate for 15 USDC
+
+As noted in the [FullMath](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/FullMath.sol) library, it was designed in order to handle "phantom overflow" i.e., allows multiplication and division where an intermediate value overflows 256 bits.
+This means that the **original** library can handle statements like : `FullMath.mulDiv(type(uint256).max / 2, 3, 111))` . 
+This a feature of the library, as statements like this cannot be handled by solidity `>0.8` directly as the execution will revert due to an overflow. Because the original library was created with solidity version `<0.8.0`(which doesn't revert on overflows) this behaviour was allowed as the **expected** intermediatory overflow could be reached. 
+
+However, due to the fact that the FullMath Library was ported to solidity version [`0.8.9`](https://github.com/sherlock-audit/2023-01-uxd/blob/334b38b582d794c76a2062e672804d99fc24675c/contracts/libraries/FullMath.sol#L2), which is 
+`>0.8`, this operation would revert as the intermediate calculations would overflow, meaning that it can't handle those multiplication and division where an intermediate value overflows the 256 bits.
+The fix is to mark the full body in an unchecked block, in order to leverage the fact that the original version was designed in order to allow the intermediate overflow. 
+
+I think that the comment left by the sponsor: `Unchecked doesn't handle the error,` , doesn't reflect the issue, as by using the unchecked block the desired behaviour could be reached.
+
+A modified version of the original Fullmath library that uses unchecked blocks to handle the **intended** overflow, can be found in the 0.8 branch of the [Uniswap v3-core repo](https://github.com/Uniswap/v3-core/blob/0.8/contracts/libraries/FullMath.sol).
+
+**sherlock-admin**
+
+ > Escalate for 15 USDC
+> 
+> As noted in the [FullMath](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/FullMath.sol) library, it was designed in order to handle "phantom overflow" i.e., allows multiplication and division where an intermediate value overflows 256 bits.
+> This means that the **original** library can handle statements like : `FullMath.mulDiv(type(uint256).max / 2, 3, 111))` . 
+> This a feature of the library, as statements like this cannot be handled by solidity `>0.8` directly as the execution will revert due to an overflow. Because the original library was created with solidity version `<0.8.0`(which doesn't revert on overflows) this behaviour was allowed as the **expected** intermediatory overflow could be reached. 
+> 
+> However, due to the fact that the FullMath Library was ported to solidity version [`0.8.9`](https://github.com/sherlock-audit/2023-01-uxd/blob/334b38b582d794c76a2062e672804d99fc24675c/contracts/libraries/FullMath.sol#L2), which is 
+> `>0.8`, this operation would revert as the intermediate calculations would overflow, meaning that it can't handle those multiplication and division where an intermediate value overflows the 256 bits.
+> The fix is to mark the full body in an unchecked block, in order to leverage the fact that the original version was designed in order to allow the intermediate overflow. 
+> 
+> I think that the comment left by the sponsor: `Unchecked doesn't handle the error,` , doesn't reflect the issue, as by using the unchecked block the desired behaviour could be reached.
+> 
+> A modified version of the original Fullmath library that uses unchecked blocks to handle the **intended** overflow, can be found in the 0.8 branch of the [Uniswap v3-core repo](https://github.com/Uniswap/v3-core/blob/0.8/contracts/libraries/FullMath.sol).
+
+You've created a valid escalation for 15 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+To change the amount you've staked on this escalation: Edit your comment **(do not create a new comment)**.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**hrishibhat**
+
+Escalation accepted
+
+Agree that there could a potential overflow, & it must be updated to latest FullMath version. 
+Considering this a valid medium issue.
+
+**sherlock-admin**
+
+> Escalation accepted
+> 
+> Agree that there could a potential overflow, & it must be updated to latest FullMath version. 
+> Considering this a valid medium issue
+
+This issue's escalations have been accepted!
+
+Contestants' payouts and scores will be updated according to the changes made on this issue.
+
+**sherlock-admin**
+
+> Escalation accepted
+> 
+> Agree that there could a potential overflow, & it must be updated to latest FullMath version. 
+> Considering this a valid medium issue.
+
+This issue's escalations have been accepted!
+
+Contestants' payouts and scores will be updated according to the changes made on this issue.
+
+
+
+# Issue M-11: PerpDepository#_placePerpOrder miscalculates fees paid when shorting 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/271 
 
 ## Found by 
-peanuts, cccz, Jeiwan, keccak123, berndartmueller, GimelSec, 0x52, rvierdiiev
+Jeiwan, 0x52, berndartmueller, cccz, rvierdiiev, GimelSec, peanuts, keccak123
 
 ## Summary
 
@@ -1389,4 +1746,119 @@ Rewrite _calculatePerpOrderFeeAmount to correctly calculate the fees paid:
                 return amount.mulWadUp(getExchangeFeeWad());
     +       }
         }
+
+# Issue M-12: PerpDepository.netAssetDeposits variable can prevent users to withdraw with underflow error 
+
+Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/97 
+
+## Found by 
+rvierdiiev
+
+## Summary
+PerpDepository.netAssetDeposits variable can prevent users to withdraw with underflow error
+## Vulnerability Detail
+When user deposits using PerpDepository, then `netAssetDeposits` variable is increased with the base assets amount, provided by depositor.
+https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L283-L288
+```solidity
+    function _depositAsset(uint256 amount) private {
+        netAssetDeposits += amount;
+
+
+        IERC20(assetToken).approve(address(vault), amount);
+        vault.deposit(assetToken, amount);
+    }
+```
+
+Also when user withdraws, this `netAssetDeposits` variable is decreased with base amount that user has received for redeeming his UXD tokens.
+https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L294-L302
+```solidity
+    function _withdrawAsset(uint256 amount, address to) private {
+        if (amount > netAssetDeposits) {
+            revert InsufficientAssetDeposits(netAssetDeposits, amount);
+        }
+        netAssetDeposits -= amount;
+
+
+        vault.withdraw(address(assetToken), amount);
+        IERC20(assetToken).transfer(to, amount);
+    }
+```
+
+The problem here is that when user deposits X assets, then he receives Y UXD tokens. And when later he redeems his Y UXD tokens he can receive more or less than X assets. This can lead to situation when netAssetDeposits variable will be seting to negative value which will revert tx.
+
+Example.
+1.User deposits 1 WETH when it costs 1200$. As result 1200 UXD tokens were minted and netAssetDeposits was set to 1.
+2.Price of WETH has decreased and now it costs 1100.
+3.User redeem his 1200 UXD tokens and receives from perp protocol 1200/1100=1.09 WETH. But because netAssetDeposits is 1, then transaction will revert inside `_withdrawAsset` function with underflow error.
+## Impact
+User can't redeem all his UXD tokens.
+## Code Snippet
+https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L264-L278
+https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L294-L302
+https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L240-L253
+https://github.com/sherlock-audit/2023-01-uxd/blob/main/contracts/integrations/perp/PerpDepository.sol#L283-L288
+## Tool used
+
+Manual Review
+
+## Recommendation
+As you don't use this variable anywhere else, you can remove it.
+Otherwise you need to have 2 variables instead: totalDeposited and totalWithdrawn. 
+
+## Discussion
+
+**WarTech9**
+
+One fix: `netAssetDeposits` should be updated during rebalancing.
+
+**WarTech9**
+
+@acamill This _can only be partially fixed_ by updating `netAssetsDeposits` while rebalancing but that's only resolves the issue if rebalancing has occurred. It would still be possible to run into this if rebalancing has not yet occurred so its not a full fix. 
+We could use 2 variables as suggested but due to changes in asset values between mints and redeems, those would diverge and would be meaningless. 
+We already have the position size which tells us this information, thus removing this field is the better option.
+
+**0x00052**
+
+Escalate for 25 USDC
+
+This should only be medium severity because it is an edge case for the following reasons:
+1) It can only occur if the average withdraw price is chronically under the average deposit price.
+2) It only affects the tail end of withdraws, requiring a majority of the depository to be withdrawn
+3) This state is not permanent because later deposits/withdraws can function in reverse (i.e. deposited at 1100 and withdraw at 1200) to cause netAssetsDeposits to go back up and free stuck assets
+
+**sherlock-admin**
+
+ > Escalate for 25 USDC
+> 
+> This should only be medium severity because it is an edge case for the following reasons:
+> 1) It can only occur if the average withdraw price is chronically under the average deposit price.
+> 2) It only affects the tail end of withdraws, requiring a majority of the depository to be withdrawn
+> 3) This state is not permanent because later deposits/withdraws can function in reverse (i.e. deposited at 1100 and withdraw at 1200) to cause netAssetsDeposits to go back up and free stuck assets
+
+You've created a valid escalation for 25 USDC!
+
+To remove the escalation from consideration: Delete your comment.
+To change the amount you've staked on this escalation: Edit your comment **(do not create a new comment)**.
+
+You may delete or edit your escalation comment anytime before the 48-hour escalation window closes. After that, the escalation becomes final.
+
+**hrishibhat**
+
+Escalation accepted
+
+Given the certain specific requirements for the issue to occur, also note that there the condition can correct itself to free stuck assets.
+Considering this issue as medium
+
+**sherlock-admin**
+
+> Escalation accepted
+> 
+> Given the certain specific requirements for the issue to occur, also note that there the condition can correct itself to free stuck assets.
+> Considering this issue as medium
+
+This issue's escalations have been accepted!
+
+Contestants' payouts and scores will be updated according to the changes made on this issue.
+
+
 
