@@ -3,7 +3,7 @@
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/288 
 
 ## Found by 
-clems4ever, dipp, 0xNazgul, DecorativePineapple, ctf\_sec, unforgiven, 0x52, ck, HollaDieWaldfee, GimelSec, chiranz, berndartmueller, yixxas, Zarf, carrot, koxuan, hl\_, Ruhum, kankodu, Bahurum
+Bahurum, koxuan, carrot, dipp, kankodu, ctf\_sec, unforgiven, hl\_, ck, yixxas, berndartmueller, GimelSec, clems4ever, Ruhum, Zarf, chiranz, DecorativePineapple, 0xNazgul, 0x52, HollaDieWaldfee
 
 ## Summary
 
@@ -124,6 +124,18 @@ PerpDespository#reblance and rebalanceLite should use msg.sender instead of acco
             }
         }
 
+## Discussion
+
+**hrishibhat**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/20
+
+**IAm0x52**
+
+Fix looks good. Shortfall is now transferred from msg.sender instead of account
+
+
+
 # Issue H-2: Malicious user can use an excessively large _toAddress in OFTCore#sendFrom to break layerZero communication 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/270 
@@ -177,7 +189,7 @@ We are using  a non blocking receiver with both UXP and UXD tokens inheriting fr
 
 Please provide more details if you feel otherwise.
 
-**0x00052**
+**IAm0x52**
 
 Correct you do use a non-blocking but using a huge _toAddress will cause the function to revert before the non-blocking error handling. 
 
@@ -222,7 +234,7 @@ The message is only stored if the `catch` block is executed. In your example, if
 
 There could be some value in adding input size validation at source as recommended, since the size could be arbitrary. But this issue is medium/low risk
 
-**0x00052**
+**IAm0x52**
 
     // assert and increment the nonce. no message shuffling    
     require(_nonce == ++inboundNonce[_srcChainId][_srcAddress], "LayerZero: wrong nonce");
@@ -321,6 +333,10 @@ This issue's escalations have been rejected!
 
 Watsons who escalated this issue will have their escalation amount deducted from their next payout.
 
+**IAm0x52**
+
+LayerZero has fixed this issue with a new RelayerV2 contract 
+
 
 
 # Issue H-3: RageTrade senior vault USDC deposits are subject to utilization caps which can lock deposits for long periods of time leading to UXD instability 
@@ -328,7 +344,7 @@ Watsons who escalated this issue will have their escalation amount deducted from
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/253 
 
 ## Found by 
-clems4ever, ctf\_sec, 0x52, 0xNazgul
+ctf\_sec, clems4ever, 0x52, 0xNazgul
 
 ## Summary
 
@@ -386,6 +402,14 @@ We can mitigate this issue with buffers but that's always an issue, and adding b
 
 My personal opinion is to keep the cap on the illiquid strategy to be low enough relative to the total circulating UXD, that way keeping the high yield but reducing the liquidity crunch issue.
 That's what we are currently doing on Solana, working on smarter rebalancing and better risk management to keep these cap relevant.
+
+**WarTech9**
+
+As Alex pointed out, this is a known limitation to using a semi-liquid strategy. We will be addressing it in the long term but do not intend to fix as part of the audit.
+
+**IAm0x52**
+
+Sponsor has acknowledged this limitation 
 
 
 
@@ -482,6 +506,16 @@ This issue's escalations have been rejected!
 
 Watsons who escalated this issue will have their escalation amount deducted from their next payout.
 
+**WarTech9**
+
+This is not a valid issue. This is conflating `RageDnDepository` and `PerpDepository`. 
+`PerpDepository` does not need a way to withdraw profits as there is none, since it applies a delta-neutral strategy.
+`RageDnDepository` already has a `withdrawProfits()` function
+
+**hrishibhat**
+
+Considering this issue valid, since the funds are stuck in the contract until an upgrade. 
+
 
 
 # Issue H-5: USDC deposited to PerpDepository.sol are irretrievable and effectively causes UDX to become undercollateralized 
@@ -540,12 +574,24 @@ Manual Review
 
 Allow all USDC now deposited into the insurance fund to be redeemed 1:1
 
+## Discussion
+
+**hrishibhat**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/32
+
+**IAm0x52**
+
+Fix looks good. Quote redeeming has been enabled. I would recommend removing redundant onlyController modifier on _processQuoteRedeem
+
+
+
 # Issue H-6: PerpDepository#getPositionValue uses incorrect value for TWAP interval allowing more than intended funds to be extracted 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/249 
 
 ## Found by 
-HonorLt, 0x52, berndartmueller, 0Kage, cccz, DecorativePineapple, ctf\_sec
+HonorLt, berndartmueller, DecorativePineapple, ctf\_sec, 0Kage, cccz, 0x52
 
 ## Summary
 
@@ -593,12 +639,25 @@ Manual Review
 
 I recommend pulling pulling the TWAP fresh each time from ClearingHouseConfig, because the TWAP can be changed at anytime. If it is desired to make it a constant then it should at least be changed from 15 to 900.
 
+## Discussion
+
+**hrishibhat**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/21
+
+
+**IAm0x52**
+
+Fix looks good. TWAP corrected from 15 to 900
+
+
+
 # Issue H-7: User specified slippage allows frontrunning 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/192 
 
 ## Found by 
-HonorLt, minhtrng, jonatascm, koxuan, yixxas, wagmi, ck, HollaDieWaldfee, zeroknots, GimelSec, peanuts, keccak123
+HonorLt, yixxas, jonatascm, zeroknots, koxuan, wagmi, GimelSec, peanuts, minhtrng, keccak123, ck, HollaDieWaldfee
 
 ## Summary
 
@@ -635,6 +694,10 @@ Manual Review
 
 This is a duplicate of #288 
 
+**IAm0x52**
+
+Fixed in same PR as #288 
+
 
 
 # Issue M-1: `rebalanceLite` should provide a slippage protection 
@@ -642,7 +705,7 @@ This is a duplicate of #288
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/429 
 
 ## Found by 
-HollaDieWaldfee, hansfriese
+hansfriese, HollaDieWaldfee
 
 ## Summary
 Users can lose funds while rebalancing.
@@ -800,6 +863,17 @@ This issue's escalations have been accepted!
 
 Contestants' payouts and scores will be updated according to the changes made on this issue.
 
+**WarTech9**
+
+Fixed here by removing `sqrtPriceLimitX96` in swap when rebalancing
+https://github.com/UXDProtocol/uxd-evm/pull/24
+
+**IAm0x52**
+
+Fixed in [this PR](https://github.com/UXDProtocol/uxd-evm/pull/37)
+
+Replaces sqrtPriceLimitX96 with minAmountOut and enforces it as slippage protection
+
 
 
 # Issue M-2: `PerpDepository._rebalanceNegativePnlWithSwap()` shouldn't use a `sqrtPriceLimitX96` twice. 
@@ -866,12 +940,24 @@ Manual Review
 ## Recommendation
 I think we can use the `sqrtPriceLimitX96` param for one pool only and it would be enough as there is an `amountOutMinimum` condition.
 
+## Discussion
+
+**WarTech9**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/24
+
+**IAm0x52**
+
+Fix looks good. `sqrtPriceLimitX96` is now only applied to the second swap
+
+
+
 # Issue M-3: Vulnerable GovernorVotesQuorumFraction version 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/423 
 
 ## Found by 
-ctf\_sec, HonorLt
+HonorLt, ctf\_sec
 
 ## Summary
 The protocol uses an OZ version of contracts that contain a known vulnerability in government contracts.
@@ -919,6 +1005,10 @@ This was already fixed here: https://github.com/UXDProtocol/uxd-evm/commit/dcaa0
 This requires certain scenario where the previous quorum should have failed & the quorum fraction has to be changed post which this issue could be valid. 
 Considering this issue a valid medium. 
 
+**IAm0x52**
+
+Fix looks good. Contract version has been updated
+
 
 
 # Issue M-4: Deposit and withdraw to the vault with the wrong decimals of amount in contract `PerpDepository` 
@@ -926,7 +1016,7 @@ Considering this issue a valid medium.
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/402 
 
 ## Found by 
-berndartmueller, yixxas, HollaDieWaldfee, Bahurum, rvierdiiev, duc, peanuts
+yixxas, Bahurum, berndartmueller, duc, peanuts, rvierdiiev, HollaDieWaldfee
 
 ## Summary
 Function `vault.deposit` and `vault.withdraw` of vault in contract `PerpDepository` need to be passed with the amount in raw decimal of tokens (is different from 18 in case using USDC, WBTC, ... as base and quote tokens). But some calls miss the conversion of decimals from 18 to token's decimal, and pass wrong decimals into them.
@@ -1015,6 +1105,14 @@ After further review this issue is valid. `quoteAmount` should be converted to `
 Issue exists in `_rebalanceNegativePnlWithSwap()` before `vault.deposit()`. Need to convert from 18 decimals to 6 for USDC.
 Issue does not exist in `_rebalanceNegativePnlLite` where amount returned by `_placePerpOrder()` is already in 18 decimals. So no conversion required before `vault.withdraw()`.
 
+**WarTech9**
+
+Fixed here: https://github.com/UXDProtocol/uxd-evm/pull/27
+
+**IAm0x52**
+
+Fix looks good. Decimals are now correctly adjusted for quote deposits
+
 
 
 # Issue M-5: PerpDepository#_rebalanceNegativePnlWithSwap fails to approve vault for quote deposit 
@@ -1022,7 +1120,7 @@ Issue does not exist in `_rebalanceNegativePnlLite` where amount returned by `_p
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/372 
 
 ## Found by 
-HonorLt, 0x52, yixxas, Bahurum, rvierdiiev, GimelSec
+HonorLt, Bahurum, yixxas, GimelSec, rvierdiiev, 0x52
 
 ## Summary
 
@@ -1068,13 +1166,22 @@ Add the missing approve call:
 
 This is a duplicate of #339 
 
-**0x00052**
+**IAm0x52**
 
 Two separate issues here. #339 is pointing out it's not approved for the swapper. This one is pointing out it's not approved for the vault. It should be approved for both
 
 **WarTech9**
 
 @0x00052 good catch. You're right. This is a separate issue from #339 
+
+**WarTech9**
+
+This was fixed here: https://github.com/UXDProtocol/uxd-evm/commit/8d76f0cedc3dfc83c775ae461613c71ba5dcf1e7
+As part of the fix for #339 
+
+**IAm0x52**
+
+Fix looks good. Vault is now approved for quoteToken before deposit
 
 
 
@@ -1083,7 +1190,7 @@ Two separate issues here. #339 is pointing out it's not approved for the swapper
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/346 
 
 ## Found by 
-peanuts, HollaDieWaldfee, hl\_, berndartmueller
+berndartmueller, peanuts, hl\_, HollaDieWaldfee
 
 ## Summary
 
@@ -1193,12 +1300,24 @@ Manual Review
 
 Consider using the `Vault.getSettlementTokenValue()` function to determine the accounts' debt ([see docs](https://docs.perp.com/docs/contracts/Vault/#getsettlementtokenvalue)).
 
+## Discussion
+
+**hrishibhat**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/28
+
+**IAm0x52**
+
+Fix looks good. Contract now uses `Vault.getSettlementTokenValue()` which will return the total debt as long as return value is negative. Positive values are assumed to mean there is no debt, which lines up with [Perp docs](https://docs.perp.com/docs/contracts/Vault/#getsettlementtokenvalue)
+
+
+
 # Issue M-7: Rebalancing a negative Perp PnL via a Uniswap V3 token swap is broken due to the lack of token spending allowance 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/339 
 
 ## Found by 
-0x52, Jeiwan, berndartmueller, koxuan, jprod15, Bahurum, cccz, CRYP70, rvierdiiev, GimelSec
+Bahurum, berndartmueller, koxuan, GimelSec, jprod15, Jeiwan, rvierdiiev, CRYP70, cccz, 0x52
 
 ## Summary
 
@@ -1259,6 +1378,18 @@ Manual Review
 ## Recommendation
 
 Consider adding the appropriate token approval before the swap in L507.
+
+## Discussion
+
+**hrishibhat**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/22
+
+**IAm0x52**
+
+Fix looks good. SpotSwapper is now approved for AssetToken
+
+
 
 # Issue M-8: Redeeming all UXD tokens is not possible if some have been minted via Perp quote minting 
 
@@ -1421,6 +1552,14 @@ This issue's escalations have been accepted!
 
 Contestants' payouts and scores will be updated according to the changes made on this issue.
 
+**hrishibhat**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/32
+
+**IAm0x52**
+
+Fixed in same PR as #250 
+
 
 
 # Issue M-9: Price disparities between spot and perpetual pricing can heavily destabilize UXD 
@@ -1509,6 +1648,10 @@ But this is something that we have in mind for later
 
 This is a valid issue in case of certain market conditions or manipulations for the vUSD to trade away from the peg. 
 Considering this issue as a valid medium.
+
+**IAm0x52**
+
+Sponsor has acknowledged this risk
 
 
 
@@ -1656,6 +1799,14 @@ This issue's escalations have been accepted!
 
 Contestants' payouts and scores will be updated according to the changes made on this issue.
 
+**hrishibhat**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/30
+
+**IAm0x52**
+
+Fix looks good. Library has been updated
+
 
 
 # Issue M-11: PerpDepository#_placePerpOrder miscalculates fees paid when shorting 
@@ -1663,7 +1814,7 @@ Contestants' payouts and scores will be updated according to the changes made on
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/271 
 
 ## Found by 
-Jeiwan, 0x52, berndartmueller, cccz, rvierdiiev, GimelSec, peanuts, keccak123
+berndartmueller, keccak123, GimelSec, Jeiwan, peanuts, rvierdiiev, cccz, 0x52
 
 ## Summary
 
@@ -1747,6 +1898,18 @@ Rewrite _calculatePerpOrderFeeAmount to correctly calculate the fees paid:
     +       }
         }
 
+## Discussion
+
+**hrishibhat**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/31
+
+**IAm0x52**
+
+Fix looks good. _placePerpOrder now uses openPositionFor which returns the fee paid directly
+
+
+
 # Issue M-12: PerpDepository.netAssetDeposits variable can prevent users to withdraw with underflow error 
 
 Source: https://github.com/sherlock-audit/2023-01-uxd-judging/issues/97 
@@ -1817,7 +1980,7 @@ One fix: `netAssetDeposits` should be updated during rebalancing.
 We could use 2 variables as suggested but due to changes in asset values between mints and redeems, those would diverge and would be meaningless. 
 We already have the position size which tells us this information, thus removing this field is the better option.
 
-**0x00052**
+**IAm0x52**
 
 Escalate for 25 USDC
 
@@ -1859,6 +2022,14 @@ Considering this issue as medium
 This issue's escalations have been accepted!
 
 Contestants' payouts and scores will be updated according to the changes made on this issue.
+
+**hrishibhat**
+
+Fix: https://github.com/UXDProtocol/uxd-evm/pull/26
+
+**IAm0x52**
+
+Fixes look good. `netAssetDeposits` is now updated on rebalances
 
 
 
